@@ -1,6 +1,15 @@
 import { fetch } from '@forge/api';
 import { kvs } from '@forge/kvs';
 
+const getAuthorizationHeader = async () => {
+  try {
+    return await kvs.getSecret('authorizationHeader');
+  } catch (error) {
+    console.log('kvs.getSecret failed, falling back to kvs.get:', error?.message);
+    return await kvs.get('authorizationHeader');
+  }
+};
+
 export async function fetchExternalData(payload) {
   const { parameter1, parameter2 } = payload;
 
@@ -17,7 +26,7 @@ export async function fetchExternalData(payload) {
 
   const headers = { Accept: 'application/json' };
 
-  const authorizationHeader = await kvs.getSecret('authorizationHeader');
+  const authorizationHeader = await getAuthorizationHeader();
   if (authorizationHeader) {
     headers['Authorization'] = authorizationHeader;
   }
