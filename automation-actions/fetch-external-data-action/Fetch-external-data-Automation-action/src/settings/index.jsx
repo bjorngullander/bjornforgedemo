@@ -15,7 +15,7 @@ import ForgeReconciler, {
 
 const SettingsForm = () => {
   const [loading, setLoading] = useState(true);
-  const [hasApiToken, setHasApiToken] = useState(false);
+  const [hasAuthorizationHeader, setHasAuthorizationHeader] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
@@ -23,9 +23,9 @@ const SettingsForm = () => {
 
   useEffect(() => {
     invoke('getSettings')
-      .then(({ urlTemplate, hasApiToken: tokenSet }) => {
-        reset({ urlTemplate, apiToken: '' });
-        setHasApiToken(tokenSet);
+      .then(({ urlTemplate, hasAuthorizationHeader: headerSet }) => {
+        reset({ urlTemplate, authorizationHeader: '' });
+        setHasAuthorizationHeader(headerSet);
         setLoading(false);
       })
       .catch(() => {
@@ -40,13 +40,13 @@ const SettingsForm = () => {
     try {
       await invoke('saveSettings', {
         urlTemplate: data.urlTemplate,
-        apiToken: data.apiToken || undefined,
+        authorizationHeader: data.authorizationHeader || undefined,
       });
       setSaved(true);
-      setHasApiToken(hasApiToken || !!data.apiToken);
-      reset({ urlTemplate: data.urlTemplate, apiToken: '' });
-    } catch {
-      setSaveError('Failed to save settings. Please try again.');
+      setHasAuthorizationHeader(hasAuthorizationHeader || !!data.authorizationHeader);
+      reset({ urlTemplate: data.urlTemplate, authorizationHeader: '' });
+    } catch (error) {
+      setSaveError('Failed to save settings. Please try again.' + error.message);
     }
   };
 
@@ -58,7 +58,7 @@ const SettingsForm = () => {
     required: { value: true, message: 'URL is required' },
   });
 
-  const { onChange: tokenOnChange, ...tokenRegisterProps } = register('apiToken');
+  const { onChange: authOnChange, ...authRegisterProps } = register('authorizationHeader');
 
   return (
     <Box padding="space.400">
@@ -71,7 +71,7 @@ const SettingsForm = () => {
           </Text>
 
           <Stack space="space.100">
-            <Text>URL Template</Text>
+            <Text>URL Template updated</Text>
             <Textfield
               {...urlRegisterProps}
               onChange={(e) => { urlOnChange(e); }}
@@ -83,17 +83,17 @@ const SettingsForm = () => {
           </Stack>
 
           <Stack space="space.100">
-            <Text>API Token</Text>
-            {hasApiToken && (
-              <Text>An API token is currently configured. Enter a new value below to replace it.</Text>
+            <Text>Authorization Header</Text>
+            {hasAuthorizationHeader && (
+              <Text>An authorization header is currently configured. Enter a new value below to replace it.</Text>
             )}
             <Textfield
-              {...tokenRegisterProps}
-              onChange={(e) => { tokenOnChange(e); }}
-              placeholder={hasApiToken ? 'Leave blank to keep the existing token' : 'Enter API token'}
+              {...authRegisterProps}
+              onChange={(e) => { authOnChange(e); }}
+              placeholder={hasAuthorizationHeader ? 'Leave blank to keep the existing value' : 'e.g. Bearer mytoken  or  Basic dXNlcjpwYXNz'}
               type="password"
             />
-            <Text>The token is stored securely and will be sent as a Bearer token in the Authorization header.</Text>
+            <Text>Enter the full Authorization header value. It will be sent verbatim, e.g. "Bearer &lt;token&gt;" or "Basic &lt;base64credentials&gt;".</Text>
           </Stack>
 
           {saved && (

@@ -5,15 +5,16 @@ const resolver = new Resolver();
 
 resolver.define('getSettings', async () => {
   const urlTemplate = await kvs.get('urlTemplate');
-  const hasApiToken = !!(await kvs.getSecret('apiToken'));
-  return { urlTemplate: urlTemplate || '', hasApiToken };
+  console.log('getSettings urlTemplate:', urlTemplate);
+  const hasAuthorizationHeader = !!(await kvs.getSecret('authorizationHeader'));
+  return { urlTemplate: urlTemplate || '', hasAuthorizationHeader };
 });
 
 resolver.define('saveSettings', async ({ payload }) => {
-  const { urlTemplate, apiToken } = payload;
+  const { urlTemplate, authorizationHeader } = payload;
   await kvs.set('urlTemplate', urlTemplate);
-  if (apiToken) {
-    await kvs.setSecret('apiToken', apiToken);
+  if (authorizationHeader) {
+    await kvs.setSecret('authorizationHeader', authorizationHeader);
   }
   return { success: true };
 });

@@ -17,9 +17,9 @@ export async function fetchExternalData(payload) {
 
   const headers = { Accept: 'application/json' };
 
-  const apiToken = await kvs.getSecret('apiToken');
-  if (apiToken) {
-    headers['Authorization'] = `Bearer ${apiToken}`;
+  const authorizationHeader = await kvs.getSecret('authorizationHeader');
+  if (authorizationHeader) {
+    headers['Authorization'] = authorizationHeader;
   }
 
   const response = await fetch(url, { method: 'GET', headers });
