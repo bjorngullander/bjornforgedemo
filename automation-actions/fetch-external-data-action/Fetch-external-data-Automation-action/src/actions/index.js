@@ -3,11 +3,23 @@ import { kvs } from '@forge/kvs';
 
 const getAuthorizationHeader = async () => {
   try {
-    return await kvs.getSecret('authorizationHeader');
+    const value = await kvs.get('authorizationHeader');
+    if (value) {
+      return value;
+    }
   } catch (error) {
-    console.log('kvs.getSecret failed, falling back to kvs.get:', error?.message);
-    return await kvs.get('authorizationHeader');
+    console.log('kvs.get failed:', error?.message);
   }
+
+  try {
+    if (typeof kvs.getSecret === 'function') {
+      return await kvs.getSecret('authorizationHeader');
+    }
+  } catch (error) {
+    console.log('kvs.getSecret failed:', error?.message);
+  }
+
+  return undefined;
 };
 
 export async function fetchExternalData(payload) {

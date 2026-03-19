@@ -5,19 +5,38 @@ const resolver = new Resolver();
 
 const getAuthorizationHeader = async () => {
   try {
-    return await kvs.getSecret('authorizationHeader');
+    const value = await kvs.get('authorizationHeader');
+    if (value) {
+      return value;
+    }
   } catch (error) {
-    console.log('kvs.getSecret failed, falling back to kvs.get:', error?.message);
-    return await kvs.get('authorizationHeader');
+    console.log('kvs.get failed:', error?.message);
   }
+
+  try {
+    if (typeof kvs.getSecret === 'function') {
+      return await kvs.getSecret('authorizationHeader');
+    }
+  } catch (error) {
+    console.log('kvs.getSecret failed:', error?.message);
+  }
+
+  return undefined;
 };
 
 const setAuthorizationHeader = async (value) => {
   try {
-    await kvs.setSecret('authorizationHeader', value);
-  } catch (error) {
-    console.log('kvs.setSecret failed, falling back to kvs.set:', error?.message);
     await kvs.set('authorizationHeader', value);
+  } catch (error) {
+    console.log('kvs.set failed:', error?.message);
+  }
+
+  try {
+    if (typeof kvs.setSecret === 'function') {
+      await kvs.setSecret('authorizationHeader', value);
+    }
+  } catch (error) {
+    console.log('kvs.setSecret failed:', error?.message);
   }
 };
 
