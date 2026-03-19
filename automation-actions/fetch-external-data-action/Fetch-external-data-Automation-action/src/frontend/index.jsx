@@ -12,30 +12,29 @@ import ForgeReconciler, {
   Box,
 } from '@forge/react';
 
-const CommentForm = ({ context, isValidating }) => {
+const FetchDataForm = ({ context, isValidating }) => {
   const formInstance = useForm({
     defaultValues: context.extension.data.inputs,
-    disabled: isValidating
+    disabled: isValidating,
   });
   const { handleSubmit, register, getValues, formState } = formInstance;
 
   const onChange = (input) => {
     const updatedFormData = { ...getValues(), ...input };
-
     view.submit(updatedFormData);
   };
 
-  const onSubmit = data => {
+  const onSubmit = (data) => {
     view.submit(data);
   };
 
-  const { onChange: issueKeyOnChange, ...issueKeyRegisterProps } = register('issueKey', {
-    required: { value: true, message: 'Issue key is required' },
+  const { onChange: param1OnChange, ...param1RegisterProps } = register('parameter1', {
+    required: { value: true, message: 'Parameter 1 is required' },
     disabled: isValidating,
   });
 
-  const { onChange: commentOnChange, ...commentRegisterProps } = register('comment', {
-    required: { value: true, message: 'Comment is required' },
+  const { onChange: param2OnChange, ...param2RegisterProps } = register('parameter2', {
+    required: { value: true, message: 'Parameter 2 is required' },
     disabled: isValidating,
   });
 
@@ -43,31 +42,27 @@ const CommentForm = ({ context, isValidating }) => {
     <Box>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Stack space="space.100">
-          <Text>Issue key</Text>
+          <Text>Parameter 1</Text>
           <Textfield
-            {...issueKeyRegisterProps}
+            {...param1RegisterProps}
             onChange={(e) => {
-              issueKeyOnChange(e);
-              onChange({ issueKey: e.target.value });
+              param1OnChange(e);
+              onChange({ parameter1: e.target.value });
             }}
           />
-          {formState.errors.issueKey?.message && (
-            <ErrorMessage>
-              {formState.errors.issueKey?.message}
-            </ErrorMessage>
+          {formState.errors.parameter1?.message && (
+            <ErrorMessage>{formState.errors.parameter1?.message}</ErrorMessage>
           )}
-          <Text>Comment</Text>
+          <Text>Parameter 2</Text>
           <Textfield
-            {...commentRegisterProps}
+            {...param2RegisterProps}
             onChange={(e) => {
-              commentOnChange(e);
-              onChange({ comment: e.target.value });
+              param2OnChange(e);
+              onChange({ parameter2: e.target.value });
             }}
           />
-          {formState.errors.comment?.message && (
-            <ErrorMessage>
-              {formState.errors.comment?.message}
-            </ErrorMessage>
+          {formState.errors.parameter2?.message && (
+            <ErrorMessage>{formState.errors.parameter2?.message}</ErrorMessage>
           )}
         </Stack>
       </Form>
@@ -79,16 +74,17 @@ export const App = () => {
   const context = useProductContext();
   const [isValidating, setIsValidating] = useState(false);
 
-  // This effect sets up a listener for the 'AUTOMATION_ACTION_VALIDATE_RULE_EVENT' event.
   useEffect(() => {
     const handleValidateRuleEvent = ({ isValidating }) => {
       setIsValidating(isValidating);
     };
     const subscription = events.on('AUTOMATION_ACTION_VALIDATE_RULE_EVENT', handleValidateRuleEvent);
-    return () => subscription.then(sub => sub.unsubscribe());
+    return () => subscription.then((sub) => sub.unsubscribe());
   }, []);
 
-  return context ? <CommentForm context={context} isValidating={isValidating} /> : <Text>Loading...</Text>;
+  return context
+    ? <FetchDataForm context={context} isValidating={isValidating} />
+    : <Text>Loading...</Text>;
 };
 
 ForgeReconciler.render(

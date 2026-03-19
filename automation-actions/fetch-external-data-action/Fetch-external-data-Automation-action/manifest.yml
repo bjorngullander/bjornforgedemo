@@ -2,32 +2,38 @@ modules:
   automation:actionProvider:
     - key: fetch-external-data-automation-action-automation-action-provider-ui-kit
       actions:
-        - automation-action-ui-kit
+        - fetch-external-data-action
   action:
-    - key: automation-action-ui-kit
-      name: Automation action
-      function: add-comment-to-issue
-      description: adds comment on an issue.
+    - key: fetch-external-data-action
+      name: Fetch External Data
+      function: fetch-external-data-function
+      description: Fetches data from a configured external REST API using two input parameters and returns the JSON response for use in subsequent automation actions.
       config:
         resource: main-resource
         render: native
       inputs:
-        issueKey:
-          title: Issue Id
+        parameter1:
+          title: Parameter 1
           type: string
-          description: The issue id for the Jira issue id where a comments needs to be added
+          description: First parameter to substitute into the configured REST URL
           required: true
-        comment:
-          title: Comment
+        parameter2:
+          title: Parameter 2
           type: string
-          description: The comment that needs to be added to the issue
+          description: Second parameter to substitute into the configured REST URL
           required: true
       actionVerb: CREATE
       resolver:
         function: automation-resolver
+  jira:adminPage:
+    - key: fetch-external-data-admin-page
+      title: Fetch External Data Settings
+      resource: admin-resource
+      resolver:
+        function: automation-resolver
   function:
-    - key: add-comment-to-issue
-      handler: index.addComment
+    - key: fetch-external-data-function
+      handler: index.fetchExternalData
     - key: automation-resolver
       handler: index.handler
 app:
@@ -39,7 +45,12 @@ app:
 resources:
   - key: main-resource
     path: src/frontend/index.jsx
+  - key: admin-resource
+    path: src/settings/index.jsx
 permissions:
   scopes:
-    - write:jira-work
-    - read:jira-work
+    - storage:app
+  external:
+    fetch:
+      backend:
+        - '*'

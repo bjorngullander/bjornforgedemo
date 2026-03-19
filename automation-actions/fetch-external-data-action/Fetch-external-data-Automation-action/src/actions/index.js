@@ -1,37 +1,33 @@
-import api, { route } from "@forge/api";
+import { storage, fetch } from '@forge/api';
 
-const addJiraComment = async (issueKey, comment) => {
-  const bodyData = {
-    body: {
-      type: "doc",
-      version: 1,
-      content: [
-        { type: "paragraph", content: [{ text: comment, type: "text" }] },
-      ],
-    },
-  };
+export async function fetchExternalData(payload) {
+  const { parameter1, parameter2 } = payload;
 
-  const response = await api.asUser().requestJira(route`/rest/api/3/issue/${issueKey}/comment`, {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(bodyData),
-  });
-
-  if (response.ok) {
-    console.log(`Added comment '${comment}' to issueKey: ${issueKey}`);
-  } else {
-    console.log(
-      `Failed to add comment '${comment}' to issueKey: ${issueKey}`
+  const urlTemplate = await storage.get('urlTemplate');
+  if (!urlTemplate) {
+    throw new Error(
+      'URL is not configured. Ask your Jira administrator to configure the Fetch External Data action settings.'
     );
   }
-};
 
-export async function addComment(payload) {
-  const issueId = payload.issueKey;
-  const comment = payload.comment;
+  const url = urlTemplate
+    .replace('{parameter1}', encodeURIComponent(parameter1 ?? ''))
+    .replace('{parameter2}', encodeURIComponent(parameter2 ?? ''));
 
-  await addJiraComment(issueId, comment);
+  const headers = { Accept: 'application/json' };
+
+  const apiToken = await storage.getSecret('apiToken');
+  if (apiToken) {
+    headers['Authorization'] = `Bearer ${apiToken}`;
+  }
+
+  const response = await fetch(url, { method: 'GET', headers });
+
+  if (!response.ok) {
+    throw new Error(`External API call failed: HTTP ${response.status} ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  console.log('fetchExternalData result:', JSON.stringify(data));
+  return data;
 }
