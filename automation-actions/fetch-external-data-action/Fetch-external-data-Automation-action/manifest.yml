@@ -6,8 +6,10 @@ modules:
   action:
     - key: fetch-external-data-action
       name: Fetch External Data
-      function: fetch-external-data-function
-      description: Fetches data from a configured external REST API using two input parameters and returns the JSON response for use in subsequent automation actions.
+      function: fetch-ext-data-func
+      description: Fetches data from a configured external REST API using two input
+        parameters and returns the JSON response for use in subsequent
+        automation actions.
       config:
         resource: main-resource
         render: native
@@ -21,7 +23,7 @@ modules:
           title: Parameter 2
           type: string
           description: Second parameter to substitute into the configured REST URL
-          required: true
+          required: false
       actionVerb: CREATE
       resolver:
         function: automation-resolver
@@ -32,7 +34,7 @@ modules:
       resolver:
         function: automation-resolver
   function:
-    - key: fetch-external-data-function
+    - key: fetch-ext-data-func
       handler: index.fetchExternalData
     - key: automation-resolver
       handler: index.handler
@@ -46,11 +48,11 @@ resources:
   - key: main-resource
     path: src/frontend/index.jsx
   - key: admin-resource
-    path: src/settings/index.jsx
+    path: src/settings
 permissions:
   scopes:
     - storage:app
   external:
     fetch:
       backend:
-        - '*'
+        - address: "*"
