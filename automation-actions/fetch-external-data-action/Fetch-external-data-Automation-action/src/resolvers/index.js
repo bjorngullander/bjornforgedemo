@@ -1,5 +1,5 @@
 import Resolver from '@forge/resolver';
-import { storage } from '@forge/api';
+import { storage } from '@forge/kvs';
 
 const resolver = new Resolver();
 

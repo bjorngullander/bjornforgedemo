@@ -1,4 +1,5 @@
-import { storage, fetch } from '@forge/api';
+import { fetch } from '@forge/api';
+import { storage } from '@forge/kvs';
 
 export async function fetchExternalData(payload) {
   const { parameter1, parameter2 } = payload;
