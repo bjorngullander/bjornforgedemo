@@ -1,19 +1,19 @@
 import Resolver from '@forge/resolver';
-import { storage } from '@forge/kvs';
+import { kvs } from '@forge/kvs';
 
 const resolver = new Resolver();
 
 resolver.define('getSettings', async () => {
-  const urlTemplate = await storage.get('urlTemplate');
-  const hasApiToken = !!(await storage.getSecret('apiToken'));
+  const urlTemplate = await kvs.get('urlTemplate');
+  const hasApiToken = !!(await kvs.getSecret('apiToken'));
   return { urlTemplate: urlTemplate || '', hasApiToken };
 });
 
 resolver.define('saveSettings', async ({ payload }) => {
   const { urlTemplate, apiToken } = payload;
-  await storage.set('urlTemplate', urlTemplate);
+  await kvs.set('urlTemplate', urlTemplate);
   if (apiToken) {
-    await storage.setSecret('apiToken', apiToken);
+    await kvs.setSecret('apiToken', apiToken);
   }
   return { success: true };
 });

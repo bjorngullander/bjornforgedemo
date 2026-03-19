@@ -1,10 +1,10 @@
 import { fetch } from '@forge/api';
-import { storage } from '@forge/kvs';
+import { kvs } from '@forge/kvs';
 
 export async function fetchExternalData(payload) {
   const { parameter1, parameter2 } = payload;
 
-  const urlTemplate = await storage.get('urlTemplate');
+  const urlTemplate = await kvs.get('urlTemplate');
   if (!urlTemplate) {
     throw new Error(
       'URL is not configured. Ask your Jira administrator to configure the Fetch External Data action settings.'
@@ -17,7 +17,7 @@ export async function fetchExternalData(payload) {
 
   const headers = { Accept: 'application/json' };
 
-  const apiToken = await storage.getSecret('apiToken');
+  const apiToken = await kvs.getSecret('apiToken');
   if (apiToken) {
     headers['Authorization'] = `Bearer ${apiToken}`;
   }
