@@ -25,6 +25,23 @@ modules:
           description: Second parameter to substitute into the configured REST URL
           required: false
       actionVerb: CREATE
+      outputs:
+        responseJson:
+          description: Raw JSON response from the external API as a string
+          type: string
+          nullable: false
+        statusCode:
+          description: HTTP status code from the external API
+          type: number
+          nullable: false
+        requestUrl:
+          description: Final URL used for the external API request
+          type: string
+          nullable: false
+      outputContext:
+        entityName: extdata
+        outputType: OBJECT
+        outputDomain: external
       resolver:
         function: automation-resolver
   jira:adminPage:

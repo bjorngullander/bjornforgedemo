@@ -51,5 +51,10 @@ export async function fetchExternalData(payload) {
 
   const data = await response.json();
   console.log('fetchExternalData result:', JSON.stringify(data));
-  return data;
+
+  return {
+    responseJson: JSON.stringify(data),
+    statusCode: response.status,
+    requestUrl: url,
+  };
 }
