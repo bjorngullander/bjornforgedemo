@@ -26,8 +26,8 @@ modules:
           required: false
       actionVerb: CREATE
       outputs:
-        responseJson:
-          description: Raw JSON response from the external API as a string
+        accountId:
+          description: Account ID from the external API response
           type: string
           nullable: false
         statusCode:

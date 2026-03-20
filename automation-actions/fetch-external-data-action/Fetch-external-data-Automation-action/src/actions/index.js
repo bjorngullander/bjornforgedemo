@@ -53,8 +53,10 @@ export async function fetchExternalData(payload) {
   console.log('fetchExternalData result:', JSON.stringify(data));
 
   return {
-    responseJson: JSON.stringify(data),
-    statusCode: response.status,
-    requestUrl: url,
+    outputs: {
+      accountId: data.lead.accountId, 
+      statusCode: response.status,
+      requestUrl: url,
+    }
   };
 }
